@@ -26,7 +26,7 @@ const vscode = require("vscode");
 
 function updateConfiguration(context) {
     let newGcovBinary = process.argv[0] + ' ' + context.asAbsolutePath("gcov.js") + ' ' + vscode.workspace.getConfiguration("gcovViewerOlder").get("gcovBinary");
-    if (vscode.workspace.getConfiguration("gcovViewer").get("gcovBinary") != newGcovBinary) {
+    if (vscode.workspace.getConfiguration("gcovViewer").get("gcovBinary").replace(/mblet.gcov-viewer-older-[0-9]+.[0-9]+.[0-9]+/, "") != newGcovBinary.replace(/mblet.gcov-viewer-older-[0-9]+.[0-9]+.[0-9]+/, "")) {
         vscode.workspace.getConfiguration().update("gcovViewer.gcovBinary", newGcovBinary, vscode.ConfigurationTarget.Global);
         vscode.window.showInformationMessage('[gcovViewer.gcovBinary] has been replaced with gcov-viewer-older adapter');
     }

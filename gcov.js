@@ -33,7 +33,9 @@ function readGcovToJson(str) {
     };
     const lines = str.split('\n');
     let lastLineNumber = '0';
+    let lastFuncLineNumber = '0';
     let func = '';
+    let file_id = 0;
     for (let i = 0; i < lines.length; i++) {
         try {
             const lineParams = lines[i].split(':', 4);
@@ -42,17 +44,31 @@ function readGcovToJson(str) {
                 lineParams[1].trim() == '0' &&
                 lineParams[2].trim() == 'Source') {
                 result["files"].push({ "file": lineParams[3], "lines": [], "functions": [] })
-            }
-            else if (lineParams[0].trim() != '-') {
-                ldata = {
-                    "branches": [],
-                    "count": parseInt(lineParams[0].trim()),
-                    "line_number": parseInt(lineParams[1].trim()),
-                    "unexecuted_block": false,
-                    "function_name": func
-                };
+                func = '';
                 file_id = result["files"].length - 1;
-                result["files"][file_id]["lines"].push(ldata);
+            }
+            else if (lineParams.length > 2 && lineParams[0].trim() != '-' &&
+                     !isNaN(lineParams[1].trim())) {
+                if (lastFuncLineNumber == lineParams[1].trim()) {
+                    lastCount = result["files"][file_id]["lines"][result["files"][file_id]["lines"].length - 1]["count"];
+                    currentCount = parseInt(lineParams[0].trim()) || 0;
+                    if (lastCount < currentCount) {
+                        result["files"][file_id]["lines"][result["files"][file_id]["lines"].length - 1]["count"] = currentCount;
+                    }
+                    result["files"][file_id]["lines"][result["files"][file_id]["lines"].length - 1]["function_name"] = func;
+                }
+                else {
+                    lastFuncLineNumber = lineParams[1].trim();
+                    ldata = {
+                        "branches": [],
+                        "count": parseInt(lineParams[0].trim()) || 0,
+                        "line_number": parseInt(lineParams[1].trim()),
+                        "unexecuted_block": false,
+                        "function_name": func
+                    };
+                    result["files"][file_id]["lines"].push(ldata);
+                    result["files"][file_id]["functions"][result["files"][file_id]["functions"].length  - 1]["end_line"] = ldata["line_number"];
+                }
             }
         }
         catch {
@@ -62,7 +78,7 @@ function readGcovToJson(str) {
                 fdata = {
                     "blocks": 0,
                     "end_column": 0,
-                    "start_line": parseInt(lastLineNumber),
+                    "start_line": parseInt(lastLineNumber) + 1,
                     "name": func,
                     "blocks_executed": 0,
                     "execution_count": 0,
@@ -70,7 +86,6 @@ function readGcovToJson(str) {
                     "start_column": 0,
                     "end_line": 0
                 };
-                file_id = result["files"].length - 1;
                 result["files"][file_id]["functions"].push(fdata);
             }
         }
