@@ -36,45 +36,11 @@ function readGcovToJson(str) {
     let lastFuncLineNumber = '0';
     let func = '';
     let file_id = 0;
-    for (let i = 0; i < lines.length; i++) {
+    for (let i = 0; i < lines.length - 1; i++) {
         try {
-            const lineParams = lines[i].split(':', 4);
-            lastLineNumber = lineParams[1].trim();
-            if (lineParams[0].trim() == '-' &&
-                lineParams[1].trim() == '0' &&
-                lineParams[2].trim() == 'Source') {
-                result["files"].push({ "file": lineParams[3], "lines": [], "functions": [] })
-                func = '';
-                file_id = result["files"].length - 1;
-            }
-            else if (lineParams.length > 2 && lineParams[0].trim() != '-' &&
-                     !isNaN(lineParams[1].trim())) {
-                if (lastFuncLineNumber == lineParams[1].trim()) {
-                    lastCount = result["files"][file_id]["lines"][result["files"][file_id]["lines"].length - 1]["count"];
-                    currentCount = parseInt(lineParams[0].trim()) || 0;
-                    if (lastCount < currentCount) {
-                        result["files"][file_id]["lines"][result["files"][file_id]["lines"].length - 1]["count"] = currentCount;
-                    }
-                    result["files"][file_id]["lines"][result["files"][file_id]["lines"].length - 1]["function_name"] = func;
-                }
-                else {
-                    lastFuncLineNumber = lineParams[1].trim();
-                    ldata = {
-                        "branches": [],
-                        "count": parseInt(lineParams[0].trim()) || 0,
-                        "line_number": parseInt(lineParams[1].trim()),
-                        "unexecuted_block": false,
-                        "function_name": func
-                    };
-                    result["files"][file_id]["lines"].push(ldata);
-                    result["files"][file_id]["functions"][result["files"][file_id]["functions"].length  - 1]["end_line"] = ldata["line_number"];
-                }
-            }
-        }
-        catch {
-            const lineParams = lines[i].split(' ', 2);
-            if (lineParams[0].trim() == 'function') {
-                func = lineParams[1].trim();
+            const lineParamsSpace = lines[i].split(' ', 2);
+            if (lineParamsSpace[0].trim() == 'function') {
+                func = lineParamsSpace[1].trim();
                 fdata = {
                     "blocks": 0,
                     "end_column": 0,
@@ -88,6 +54,44 @@ function readGcovToJson(str) {
                 };
                 result["files"][file_id]["functions"].push(fdata);
             }
+            else if (lineParamsSpace == "------------------" || lineParamsSpace[0].trim() == 'branch' || lineParamsSpace[0].trim() == 'call') {
+            }
+            else {
+                const lineParams = lines[i].split(':', 4);
+                lastLineNumber = lineParams[1].trim();
+                if (lineParams[0].trim() == '-' &&
+                    lineParams[1].trim() == '0' &&
+                    lineParams[2].trim() == 'Source') {
+                    result["files"].push({ "file": lineParams[3], "lines": [], "functions": [] })
+                    func = '';
+                    file_id = result["files"].length - 1;
+                }
+                else if (func != '' && lineParams.length > 2 && lineParams[0].trim() != '-' &&
+                        !isNaN(lineParams[1].trim())) {
+                    if (lastFuncLineNumber == lineParams[1].trim()) {
+                        lastCount = result["files"][file_id]["lines"][result["files"][file_id]["lines"].length - 1]["count"];
+                        currentCount = parseInt(lineParams[0].trim()) || 0;
+                        if (lastCount < currentCount) {
+                            result["files"][file_id]["lines"][result["files"][file_id]["lines"].length - 1]["count"] = currentCount;
+                        }
+                        result["files"][file_id]["lines"][result["files"][file_id]["lines"].length - 1]["function_name"] = func;
+                    }
+                    else {
+                        lastFuncLineNumber = lineParams[1].trim();
+                        ldata = {
+                            "branches": [],
+                            "count": parseInt(lineParams[0].trim()) || 0,
+                            "line_number": parseInt(lineParams[1].trim()),
+                            "unexecuted_block": false,
+                            "function_name": func
+                        };
+                        result["files"][file_id]["lines"].push(ldata);
+                        result["files"][file_id]["functions"][result["files"][file_id]["functions"].length  - 1]["end_line"] = ldata["line_number"];
+                    }
+                }
+            }
+        }
+        catch {
         }
     }
     return JSON.stringify(result);

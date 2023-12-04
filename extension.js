@@ -33,7 +33,8 @@ function updateConfiguration(context) {
 }
 
 function activate(context) {
-    updateConfiguration(context);
+    let newGcovBinary = process.argv[0] + ' ' + context.asAbsolutePath("gcov.js") + ' ' + vscode.workspace.getConfiguration("gcovViewerOlder").get("gcovBinary");
+    vscode.workspace.getConfiguration().update("gcovViewer.gcovBinary", newGcovBinary, vscode.ConfigurationTarget.Global);
     // event configuration change
     vscode.workspace.onDidChangeConfiguration(event => {
         updateConfiguration(context);
