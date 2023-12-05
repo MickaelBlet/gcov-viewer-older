@@ -4,5 +4,8 @@ Show code coverage data generated with older version of gcov for C or C++ langag
 
 ## Background
 - Compatiable for plugin [Gcov Viewer](https://github.com/JacquesLucke/gcov-viewer) in VSCode.
-- Transfers gcov lines format to gcov-9 json format.
+- Call `gcov` command with `--branch-probabilities --long-file-names` options and tranform the gcov files to gcov-9 json format.
 - Update the `gcovViewer.gcovBinary` configuration with the extension command.
+
+## Tips
+- You can view demangled function name with add `--demangled-names` option in `gcovViewerOlder.gcovBinary` property if your gcov version support this option.

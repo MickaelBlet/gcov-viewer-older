@@ -2,7 +2,7 @@
     "name": "gcov-viewer-older",
     "displayName": "Gcov Viewer Older",
     "description": "Show code coverage data generated with older version of gcov for C or C++",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "publisher": "mblet",
     "engines": {
         "vscode": "^0.0.0"
@@ -32,7 +32,7 @@
                     "type": "string",
                     "title": "Gcov binary",
                     "markdownDescription": "Path to the gcov binary.",
-                    "default": "gcov --function-summaries --branch-probabilities --branch-counts --long-file-names"
+                    "default": "gcov --branch-probabilities --long-file-names"
                 }
             }
         }
