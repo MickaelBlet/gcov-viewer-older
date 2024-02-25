@@ -2,7 +2,7 @@
     "name": "gcov-viewer-older",
     "displayName": "Gcov Viewer Older",
     "description": "Show code coverage data generated with older version of gcov for C or C++",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "publisher": "mblet",
     "engines": {
         "vscode": "^0.0.0"

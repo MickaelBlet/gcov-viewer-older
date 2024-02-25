@@ -116,7 +116,7 @@ try {
             return;
         }
         child_process.exec(
-            `${gcovCommand} 1> /dev/null 2> /dev/null && cat *.gcov`,
+            `${gcovCommand} 1> /dev/null 2> /dev/null ; cat *.gcov ; cd .. ; rm -rf ${folder}`,
             {
                 cwd: folder,
                 maxBuffer: 256 * 1024 * 1024
@@ -131,6 +131,6 @@ try {
         );
     });
 }
-catch {
-    console.error("Cannot create a tmp directory");
+catch (error) {
+    console.error(error);
 }
